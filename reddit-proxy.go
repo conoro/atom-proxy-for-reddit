@@ -62,7 +62,7 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 			Title:       inputItem.Title,
 			Link:        &feeds.Link{Href: inputItem.Link},
 			Description: inputItem.Content,
-			Author:      &feeds.Author{Name: inputItem.Author.Name, Email: inputItem.Author.Email},
+			Author:      &feeds.Author{Name: "conor@conoroneill.com", Email: "conor@conoroneill.com"},
 			Created:     timeStamp,
 		}
 		RSSXML.Add(&outputItem)
