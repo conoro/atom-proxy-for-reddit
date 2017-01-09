@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/SlyMarbo/rss"
 	"github.com/gorilla/feeds"
@@ -46,7 +47,7 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 		io.WriteString(w, "Error from Reddit")
 	} else {
 
-		fmt.Println(inputFeed.Title)
+		fmt.Println(time.Now().Format(time.RFC850), " ", inputFeed.Title)
 
 		var RSSXML = &feeds.Feed{
 			Title:       inputFeed.Title,

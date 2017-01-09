@@ -53,7 +53,7 @@ func FetchByClient(url string, client *http.Client) (*Feed, error) {
 
 		req, _ := http.NewRequest("GET", url, nil)
 
-		req.Header.Set("User-Agent", "Golang_Conor_Bot/1.0")
+		req.Header.Set("User-Agent", "linux:reddit-proxy:v1.0.0 (by /u/themaven)")
 
 		resp, err2 := client.Do(req)
 
