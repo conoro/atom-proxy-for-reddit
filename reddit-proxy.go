@@ -23,17 +23,31 @@ import (
 )
 
 func running(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Got to 15")
+
 	genFeed(w, "https://www.reddit.com/r/running/")
+
+	fmt.Println("Got to 16")
+
 }
 
 func trailrunning(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Got to 17")
+
 	genFeed(w, "https://www.reddit.com/r/trailrunning/")
+
+	fmt.Println("Got to 18")
+
 }
 
 func genFeed(w http.ResponseWriter, feedURL string) {
 
+	fmt.Println("Got to 5")
+
 	fp := gofeed.NewParser()
 	inputFeed, err := fp.ParseURL(feedURL + ".rss")
+
+	fmt.Println("Got to 6")
 
 	if err != nil {
 		fmt.Println(err)
@@ -49,7 +63,11 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 		Author:      &feeds.Author{Name: "Conor", Email: "conor@conoroneill.com"},
 	}
 
+	fmt.Println("Got to 7")
+
 	for _, inputItem := range inputFeed.Items {
+
+		fmt.Println("Got to 8")
 
 		layOut := "2006-01-02T15:04:05-07:00"
 		timeStamp, err := time.Parse(layOut, inputItem.Updated)
@@ -62,19 +80,41 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 			Title:       inputItem.Title,
 			Link:        &feeds.Link{Href: inputItem.Link},
 			Description: inputItem.Content,
-			Author:      &feeds.Author{Name: "conor@conoroneill.com", Email: "conor@conoroneill.com"},
+			Author:      &feeds.Author{Name: inputItem.Author.Name, Email: inputItem.Author.Email},
 			Created:     timeStamp,
 		}
+
+		fmt.Println("Got to 9")
+
+		fmt.Println("Got to 10")
+
 		RSSXML.Add(&outputItem)
 
+		fmt.Println("Got to 11")
+
 	}
+
+	fmt.Println("Got to 12")
+
 	rss, err := RSSXML.ToRss()
 
+	fmt.Println("Got to 13")
+
 	io.WriteString(w, rss)
+
+	fmt.Println("Got to 14")
+
 }
 
 func main() {
+	//TODO: Just change the sub-reddit name to a query param so it's fully dynamic
+	//TODO: Figure out why genfeed seems to be called twice for every browser request
+	//TODO: Figure out why it's so spectacularly slow on EC2
+	fmt.Println("Got to 1")
 	http.HandleFunc("/r/running", running)
+	fmt.Println("Got to 2")
 	http.HandleFunc("/r/trailrunning", trailrunning)
+	fmt.Println("Got to 3")
 	http.ListenAndServe(":8111", nil)
+	fmt.Println("Got to 4")
 }
