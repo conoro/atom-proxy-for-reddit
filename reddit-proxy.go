@@ -43,37 +43,39 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 
 	if err != nil {
 		fmt.Println(err)
-	}
+		io.WriteString(w, "Error from Reddit")
+	} else {
 
-	fmt.Println(inputFeed.Title)
+		fmt.Println(inputFeed.Title)
 
-	var RSSXML = &feeds.Feed{
-		Title:       inputFeed.Title,
-		Link:        &feeds.Link{Href: inputFeed.Link},
-		Description: "Conors Proxy of " + inputFeed.Description,
-		Author:      &feeds.Author{Name: "Reddit", Email: "reddit@example.com"},
-	}
-
-	for _, inputItem := range inputFeed.Items {
-
-		if err != nil {
-			fmt.Println(err)
-		}
-		outputItem := feeds.Item{
-			Title:       inputItem.Title,
-			Link:        &feeds.Link{Href: inputItem.Link},
-			Description: inputItem.Content,
-			Author:      &feeds.Author{Name: inputItem.Author, Email: "reddit@example.com"},
-			Created:     inputItem.Date,
+		var RSSXML = &feeds.Feed{
+			Title:       inputFeed.Title,
+			Link:        &feeds.Link{Href: inputFeed.Link},
+			Description: "Conors Proxy of " + inputFeed.Description,
+			Author:      &feeds.Author{Name: "Reddit", Email: "reddit@example.com"},
 		}
 
-		RSSXML.Add(&outputItem)
+		for _, inputItem := range inputFeed.Items {
 
+			if err != nil {
+				fmt.Println(err)
+			}
+			outputItem := feeds.Item{
+				Title:       inputItem.Title,
+				Link:        &feeds.Link{Href: inputItem.Link},
+				Description: inputItem.Content,
+				Author:      &feeds.Author{Name: inputItem.Author, Email: "reddit@example.com"},
+				Created:     inputItem.Date,
+			}
+
+			RSSXML.Add(&outputItem)
+
+		}
+
+		rss, _ := RSSXML.ToAtom()
+
+		io.WriteString(w, rss)
 	}
-
-	rss, err := RSSXML.ToAtom()
-
-	io.WriteString(w, rss)
 
 }
 
