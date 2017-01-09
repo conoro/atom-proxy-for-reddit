@@ -15,41 +15,31 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/SlyMarbo/rss"
 	"github.com/gorilla/feeds"
 )
 
-func running(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Got to 15")
-
+func rRunning(w http.ResponseWriter, r *http.Request) {
 	genFeed(w, "https://www.reddit.com/r/running/")
-
-	fmt.Println("Got to 16")
-
 }
 
-func trailrunning(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Got to 17")
-
+func rTrailRunning(w http.ResponseWriter, r *http.Request) {
 	genFeed(w, "https://www.reddit.com/r/trailrunning/")
+}
 
-	fmt.Println("Got to 18")
+func everythingElse(w http.ResponseWriter, r *http.Request) {
+	subReddit := r.URL.Query().Get("r")
 
+	genFeed(w, "https://www.reddit.com/r/"+subReddit)
 }
 
 func genFeed(w http.ResponseWriter, feedURL string) {
 
-	fmt.Println("Got to 5")
-
 	inputFeed, err := rss.Fetch(feedURL + ".rss")
-
-	fmt.Println("Got to 6")
 
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
 	}
 
 	fmt.Println(inputFeed.Title)
@@ -61,15 +51,10 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 		Author:      &feeds.Author{Name: "Conor", Email: "conor@conoroneill.com"},
 	}
 
-	fmt.Println("Got to 7")
-
 	for _, inputItem := range inputFeed.Items {
-
-		fmt.Println("Got to 8")
 
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
 		}
 		outputItem := feeds.Item{
 			Title:       inputItem.Title,
@@ -79,37 +64,20 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 			Created:     inputItem.Date,
 		}
 
-		fmt.Println("Got to 9")
-
-		fmt.Println("Got to 10")
-
 		RSSXML.Add(&outputItem)
-
-		fmt.Println("Got to 11")
 
 	}
 
-	fmt.Println("Got to 12")
-
 	rss, err := RSSXML.ToRss()
 
-	fmt.Println("Got to 13")
-
 	io.WriteString(w, rss)
-
-	fmt.Println("Got to 14")
 
 }
 
 func main() {
-	//TODO: Just change the sub-reddit name to a query param so it's fully dynamic
-	//TODO: Figure out why genfeed seems to be called twice for every browser request
-	//TODO: Figure out why it's so spectacularly slow on EC2
-	fmt.Println("Got to 1")
-	http.HandleFunc("/r/running", running)
-	fmt.Println("Got to 2")
-	http.HandleFunc("/r/trailrunning", trailrunning)
-	fmt.Println("Got to 3")
+	//TODO: Better error handling
+	http.HandleFunc("/r/running", rRunning)
+	http.HandleFunc("/r/trailrunning", rTrailRunning)
+	http.HandleFunc("/", everythingElse)
 	http.ListenAndServe(":8111", nil)
-	fmt.Println("Got to 4")
 }
