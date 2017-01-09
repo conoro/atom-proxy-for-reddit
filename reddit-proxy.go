@@ -16,10 +16,9 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 
+	"github.com/SlyMarbo/rss"
 	"github.com/gorilla/feeds"
-	"github.com/mmcdole/gofeed"
 )
 
 func running(w http.ResponseWriter, r *http.Request) {
@@ -44,8 +43,7 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 
 	fmt.Println("Got to 5")
 
-	fp := gofeed.NewParser()
-	inputFeed, err := fp.ParseURL(feedURL + ".rss")
+	inputFeed, err := rss.Fetch(feedURL + ".rss")
 
 	fmt.Println("Got to 6")
 
@@ -69,9 +67,6 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 
 		fmt.Println("Got to 8")
 
-		layOut := "2006-01-02T15:04:05-07:00"
-		timeStamp, err := time.Parse(layOut, inputItem.Updated)
-
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -80,8 +75,8 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 			Title:       inputItem.Title,
 			Link:        &feeds.Link{Href: inputItem.Link},
 			Description: inputItem.Content,
-			Author:      &feeds.Author{Name: inputItem.Author.Name, Email: inputItem.Author.Email},
-			Created:     timeStamp,
+			Author:      &feeds.Author{Name: "conor", Email: "conor@conoroneill.com"},
+			Created:     inputItem.Date,
 		}
 
 		fmt.Println("Got to 9")
