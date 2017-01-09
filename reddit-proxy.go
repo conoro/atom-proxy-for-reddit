@@ -1,10 +1,17 @@
 // Reddit Proxy
-// This tool lets you request specific subreddits via RSS and generates its own RSS feed from them
-// It exists to deal with Feedly being blocked for (presumably) excessive requests to Reddit
-// V1 is completely hard-coded for me but could easily be made configurable.
+//
+// This tool lets you request specific subreddits via RSS and generates its own RSS feed for them
+//
+// Just request https://yourdomain.com/?r=name_of_subreddit to get a feed for https://www.reddit.com/r/name_of_subreddit
+//
+// The tool exists to deal with Feedly being blocked for (presumably) excessive requests to Reddit
+//
 // Next step is to get running on AWS Lambda
-// Note I have vendored-in gofeed so I can add a needed User-Agent for the requests.
+//
+// Note I have vendored-in the rss module so I can add a needed User-Agent for the requests.
 // A simple reverse proxy might do the same job but this was quicker for me as I had previous code
+//
+// Note I run this on an EC2 instance behind a Caddy server which gave me a Let's Encrypt Cert for free
 //
 // Copyright © 2017 Conor O'Neill, conor@conoroneill.com
 // License MIT
@@ -20,15 +27,7 @@ import (
 	"github.com/gorilla/feeds"
 )
 
-func rRunning(w http.ResponseWriter, r *http.Request) {
-	genFeed(w, "https://www.reddit.com/r/running/")
-}
-
-func rTrailRunning(w http.ResponseWriter, r *http.Request) {
-	genFeed(w, "https://www.reddit.com/r/trailrunning/")
-}
-
-func everythingElse(w http.ResponseWriter, r *http.Request) {
+func allSubreddits(w http.ResponseWriter, r *http.Request) {
 	subReddit := r.URL.Query().Get("r")
 
 	genFeed(w, "https://www.reddit.com/r/"+subReddit)
@@ -76,8 +75,6 @@ func genFeed(w http.ResponseWriter, feedURL string) {
 
 func main() {
 	//TODO: Better error handling
-	http.HandleFunc("/r/running", rRunning)
-	http.HandleFunc("/r/trailrunning", rTrailRunning)
-	http.HandleFunc("/", everythingElse)
+	http.HandleFunc("/", allSubreddits)
 	http.ListenAndServe(":8111", nil)
 }
