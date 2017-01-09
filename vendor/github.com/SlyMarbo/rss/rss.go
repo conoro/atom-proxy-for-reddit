@@ -182,6 +182,7 @@ func (f *Feed) String() string {
 // Item represents a single story.
 type Item struct {
 	Title      string
+	Author     string
 	Summary    string
 	Content    string
 	Link       string
@@ -214,6 +215,7 @@ func (i *Item) Format(indent int) string {
 	} else {
 		w := buf
 		fmt.Fprintf(w, "%sItem %q\n", single, i.Title)
+		fmt.Fprintf(w, "%s%q\n", double, i.Author)
 		fmt.Fprintf(w, "%s%q\n", double, i.Link)
 		fmt.Fprintf(w, "%s%s\n", double, i.Date.Format(DATE))
 		fmt.Fprintf(w, "%s%q\n", double, i.ID)
